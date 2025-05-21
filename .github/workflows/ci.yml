@@ -20,13 +20,21 @@ jobs:
           distribution: 'temurin'
 
       - name: Build and test with Maven
-        run: mvn clean verify
+        run: mvn clean verify --no-transfer-progress -U
+        env:
+          MAVEN_OPTS: "-Xmx4g"
+
+      - name: List Test Results
+        run: ls -la target/surefire-reports || echo "No test reports found"
+        if: success() || failure()
 
       - name: Generate JaCoCo Report
         run: mvn jacoco:report
+        if: success() || failure()
 
       - name: List JaCoCo Report Files
         run: ls -la target/site/jacoco || echo "JaCoCo report directory not found"
+        if: success() || failure()
 
       - name: Archive JaCoCo Report
         uses: actions/upload-artifact@v4
